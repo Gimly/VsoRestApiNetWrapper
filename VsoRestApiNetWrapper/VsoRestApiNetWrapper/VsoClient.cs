@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace VsoRestApiNetWrapper
 {
-    public class VsoAccount
+    public class VsoClient
     {
         private const string BASE_URL_FORMAT = "https://{0}.visualstudio.com/DefaultCollection/_apis/";
 
@@ -20,7 +20,7 @@ namespace VsoRestApiNetWrapper
 
         private string altPassword;
 
-        public VsoAccount(string accountName, string altUsername, string altPassword)
+        public VsoClient(string accountName, string altUsername, string altPassword)
         {
             this.accountName = accountName;
             this.altPassword = altPassword;
@@ -30,6 +30,18 @@ namespace VsoRestApiNetWrapper
         }
 
         public string AccountName { get { return this.accountName; } }
+
+        public async Task<Profile> GetConnectedUserProfileAsync()
+        {
+            using (var client = CreateHttpClient())
+            {
+                var response = await client.GetAsync("profiles/me");
+
+                response.EnsureSuccessStatusCode();
+
+                return await response.Content.ReadAsAsync<Profile>();
+            }
+        }
 
         public async Task<IEnumerable<Project>> GetProjectsAsync()
         {
@@ -71,7 +83,7 @@ namespace VsoRestApiNetWrapper
             return client;
         }
 
-        public static byte[] StringToAscii(string s)
+        private static byte[] StringToAscii(string s)
         {
             byte[] retval = new byte[s.Length];
             for (int ix = 0; ix < s.Length; ++ix)

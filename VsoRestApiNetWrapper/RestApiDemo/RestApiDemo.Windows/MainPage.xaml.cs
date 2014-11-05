@@ -35,9 +35,9 @@ namespace RestApiDemo
             var userName = this.UserName.Text;
             var password = this.Password.Text;
 
-            VsoAccount account = new VsoAccount(accountName, userName, password);
+            VsoClient client = new VsoClient(accountName, userName, password);
 
-            this.Projects.ItemsSource = await account.GetProjectsAsync();
+            this.Projects.ItemsSource = await client.GetProjectsAsync();
         }
     }
 }
