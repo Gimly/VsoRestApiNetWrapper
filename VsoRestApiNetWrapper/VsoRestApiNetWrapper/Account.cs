@@ -20,5 +20,11 @@ namespace VsoRestApiNetWrapper
         public Guid CreatorId { get; set; }
 
         public DateTime CreatedDate { get; set; }
+
+        public Guid LastUpdaterId { get; set; }
+
+        public DateTime LastUpdatedDate { get; set; }
+
+        public string OrganizationName { get; set; }
     }
 }
