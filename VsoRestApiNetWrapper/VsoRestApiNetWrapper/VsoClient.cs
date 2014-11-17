@@ -43,6 +43,33 @@ namespace VsoRestApiNetWrapper
             }
         }
 
+        public async Task<IEnumerable<Account>> GetAccountsByOwner(Guid ownerId)
+        {
+            using (var client = CreateHttpClient())
+            {
+                var response = await client.GetAsync(string.Format("Accounts/ownerId={0}", ownerId));
+
+                response.EnsureSuccessStatusCode();
+
+                var dto = await response.Content.ReadAsAsync<List<AccountDto>>();
+
+                return dto.Select(
+                    x => new Account
+                    {
+                        Id = x.AccountId,
+                        Uri = x.AccountUri,
+                        Name = x.AccountName,
+                        OwnerId = x.AccountOwner,
+                        Status = x.AccountStatus,
+                        CreatorId = x.CreatedBy,
+                        CreatedDate = x.CreatedDate,
+                        LastUpdaterId = x.LastUpdatedBy,
+                        LastUpdatedDate = x.LastUpdatedDate,
+                        OrganizationName = x.OrganizationName
+                    });
+            }
+        }
+
         public async Task<IEnumerable<Project>> GetProjectsAsync()
         {
             using (var client = CreateHttpClient())
