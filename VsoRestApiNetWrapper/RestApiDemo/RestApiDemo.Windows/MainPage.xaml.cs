@@ -24,6 +24,9 @@ namespace RestApiDemo
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        VsoClient client;
+        private IEnumerable<Project> projects;
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -35,9 +38,16 @@ namespace RestApiDemo
             var userName = this.UserName.Text;
             var password = this.Password.Text;
 
-            VsoClient client = new VsoClient(accountName, userName, password);
+            client = new VsoClient(accountName)
+                            .UseBasicAuth(userName, password);
 
-            this.Projects.ItemsSource = await client.GetProjectsAsync();
+            projects = await client.GetProjectsAsync();
+            this.Projects.ItemsSource = projects;
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            await client.GetConnectedUserProfileAsync();
         }
     }
 }

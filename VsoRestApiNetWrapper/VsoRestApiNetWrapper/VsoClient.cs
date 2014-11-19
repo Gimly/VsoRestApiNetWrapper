@@ -16,17 +16,34 @@ namespace VsoRestApiNetWrapper
 
         private readonly string baseUrl;
 
+        private AuthenticationType authenticationType;
+
         private string altUsername;
 
         private string altPassword;
 
-        public VsoClient(string accountName, string altUsername, string altPassword)
+        public VsoClient(string accountName)
         {
             this.accountName = accountName;
+            this.authenticationType = AuthenticationType.NotSet;
+
+            this.baseUrl = string.Format(BASE_URL_FORMAT, accountName);
+        }
+
+        public VsoClient UseBasicAuth(string altUsername, string altPassword)
+        {
+            this.authenticationType = AuthenticationType.Basic;
             this.altPassword = altPassword;
             this.altUsername = altUsername;
 
-            this.baseUrl = string.Format(BASE_URL_FORMAT, accountName);
+            return this;
+        }
+
+        public VsoClient UseOAuth(Guid applicationId, string state, Uri redirectUrl, params OAuthScope[] scopes)
+        {
+            this.authenticationType = AuthenticationType.OAuth;
+
+            return this;
         }
 
         public string AccountName { get { return this.accountName; } }
@@ -35,7 +52,7 @@ namespace VsoRestApiNetWrapper
         {
             using (var client = CreateHttpClient())
             {
-                var response = await client.GetAsync("profiles/me");
+                var response = await client.GetAsync("/profile/profiles/me?api-version=1.0");
 
                 response.EnsureSuccessStatusCode();
 
@@ -93,6 +110,11 @@ namespace VsoRestApiNetWrapper
 
         private HttpClient CreateHttpClient()
         {
+            if (authenticationType == AuthenticationType.NotSet)
+            {
+                throw new InvalidOperationException("The authentication must be set before calling the web service.");
+            }
+
             var client = new HttpClient()
             {
                 BaseAddress = new Uri(this.baseUrl)
@@ -101,11 +123,14 @@ namespace VsoRestApiNetWrapper
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
 
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(
-                    "Basic",
-                    Convert.ToBase64String(
-                        StringToAscii(string.Format("{0}:{1}", altUsername, altPassword))));
+            if (this.authenticationType == AuthenticationType.Basic)
+            {
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue(
+                        "Basic",
+                        Convert.ToBase64String(
+                            StringToAscii(string.Format("{0}:{1}", altUsername, altPassword))));
+            }
 
             return client;
         }

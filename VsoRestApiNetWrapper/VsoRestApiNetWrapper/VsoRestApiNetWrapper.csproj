@@ -47,6 +47,7 @@
     <Compile Include="Account.cs" />
     <Compile Include="AccountDto.cs" />
     <Compile Include="AccountStatus.cs" />
+    <Compile Include="AuthenticationType.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectDto.cs" />
     <Compile Include="ProjectsListDto.cs" />
