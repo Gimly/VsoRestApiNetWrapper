@@ -90,11 +90,11 @@ namespace VsoRestApiNetWrapper
             }
         }
 
-        public async Task<IEnumerable<Project>> GetProjectsAsync()
+        public async Task<IEnumerable<Project>> GetProjectsAsync(ProjectStateFilter filter = ProjectStateFilter.All, int numberOfProjects = 100, int projectsToSkip = 0)
         {
             using (var client = CreateHttpClient())
             {
-                var response = await client.GetAsync("projects");
+                var response = await client.GetAsync(string.Format("projects?statefilter={0}&$top={1}&$skip={2}", filter, numberOfProjects, projectsToSkip));
 
                 response.EnsureSuccessStatusCode();
 
@@ -123,8 +123,7 @@ namespace VsoRestApiNetWrapper
                 BaseAddress = new Uri(this.baseUrl)
             };
 
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Add("Accept", "application/json;api-version=1.0");
 
             AuthenticationHeaderValue authenticationHeaderValue = null;
             switch (this.authenticationType)

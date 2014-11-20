@@ -13,6 +13,6 @@ namespace VsoRestApiNetWrapper
         
         public string Url { get; set; }
         
-        public string State { get; set; }
+        public ProjectState State { get; set; }
     }
 }

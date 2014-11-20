@@ -48,10 +48,10 @@
     <Compile Include="AccountDto.cs" />
     <Compile Include="AccountStatus.cs" />
     <Compile Include="AuthenticationType.cs" />
-    <Compile Include="OAuthScope.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectDto.cs" />
     <Compile Include="ProjectsListDto.cs" />
+    <Compile Include="ProjectState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VsoClient.cs" />
     <Compile Include="Profile.cs" />
