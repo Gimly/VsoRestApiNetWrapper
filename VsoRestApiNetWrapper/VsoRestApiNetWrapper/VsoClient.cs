@@ -21,6 +21,7 @@ namespace VsoRestApiNetWrapper
         private string altUsername;
 
         private string altPassword;
+        private string accessToken;
 
         public VsoClient(string accountName)
         {
@@ -39,9 +40,11 @@ namespace VsoRestApiNetWrapper
             return this;
         }
 
-        public VsoClient UseOAuth(Guid applicationId, string state, Uri redirectUrl, params OAuthScope[] scopes)
+        public VsoClient UseOAuth(string accessToken)
         {
             this.authenticationType = AuthenticationType.OAuth;
+
+            this.accessToken = accessToken;
 
             return this;
         }
@@ -123,14 +126,25 @@ namespace VsoRestApiNetWrapper
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (this.authenticationType == AuthenticationType.Basic)
+            AuthenticationHeaderValue authenticationHeaderValue = null;
+            switch (this.authenticationType)
             {
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue(
-                        "Basic",
-                        Convert.ToBase64String(
-                            StringToAscii(string.Format("{0}:{1}", altUsername, altPassword))));
+                case AuthenticationType.Basic:
+                    authenticationHeaderValue =
+                        new AuthenticationHeaderValue(
+                            "Basic",
+                            Convert.ToBase64String(
+                                StringToAscii(string.Format("{0}:{1}", altUsername, altPassword))));
+                    break;
+                case AuthenticationType.OAuth:
+                    authenticationHeaderValue =
+                        new AuthenticationHeaderValue("Bearer", this.accessToken);
+                    break;
+                case AuthenticationType.NotSet:
+                    throw new InvalidOperationException("The authentication must be set before calling the web service.");
             }
+
+            client.DefaultRequestHeaders.Authorization = authenticationHeaderValue;
 
             return client;
         }

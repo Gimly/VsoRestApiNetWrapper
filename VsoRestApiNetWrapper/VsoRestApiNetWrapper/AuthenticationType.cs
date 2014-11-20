@@ -8,6 +8,7 @@ namespace VsoRestApiNetWrapper
     enum AuthenticationType
     {
         Basic,
-        NotSet
+        NotSet,
+        OAuth
     }
 }
